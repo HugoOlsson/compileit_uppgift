@@ -2,7 +2,7 @@ import { Link } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import RoomsIllustration from '@/assets/illustrations/rooms.svg';
+import AnimatedRoomsIllustration from '@/components/animated-rooms-illustration';
 import { fontFamily, palette, radius, spacing } from '@/theme/tokens';
 
 export default function HomeScreen() {
@@ -22,10 +22,8 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.illustrationContainer}>
-          <RoomsIllustration
+          <AnimatedRoomsIllustration
             accessibilityLabel="Planritning över fem bokningsbara rum"
-            height={216}
-            width={215}
           />
         </View>
 
