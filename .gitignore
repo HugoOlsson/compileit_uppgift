@@ -1,0 +1,11 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Local SQLite data
+*.db
+*.db-shm
+*.db-wal
+
+koduppgift-app-compileit-2026.pdf
