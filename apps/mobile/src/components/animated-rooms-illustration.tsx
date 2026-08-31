@@ -47,13 +47,7 @@ function AnimatedRoom({ height, isAvailable, width, x, y }: AnimatedRoomProps) {
   );
 }
 
-type AnimatedRoomsIllustrationProps = {
-  accessibilityLabel?: string;
-};
-
-export default function AnimatedRoomsIllustration({
-  accessibilityLabel,
-}: AnimatedRoomsIllustrationProps) {
+export default function AnimatedRoomsIllustration() {
   const [roomAvailability, setRoomAvailability] = useState<boolean[]>([
     true,
     true,
@@ -71,7 +65,7 @@ export default function AnimatedRoomsIllustration({
   }, []);
 
   return (
-    <View accessibilityLabel={accessibilityLabel} accessibilityRole="image" style={styles.container}>
+    <View style={styles.container}>
       {ROOMS.map((room, index) => (
         <AnimatedRoom
           {...room}

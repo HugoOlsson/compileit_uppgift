@@ -22,26 +22,18 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.illustrationContainer}>
-          <AnimatedRoomsIllustration
-            accessibilityLabel="Planritning över fem bokningsbara rum"
-          />
+          <AnimatedRoomsIllustration />
         </View>
 
         <View style={styles.actions}>
           <Link href="/booking" asChild>
-            <Pressable
-              accessibilityRole="button"
-              style={primaryButtonStyle}
-            >
+            <Pressable style={primaryButtonStyle}>
               <Text style={[styles.buttonLabel, styles.primaryButtonLabel]}>Gå till bokningen</Text>
             </Pressable>
           </Link>
 
           <Link href="/bookings" asChild>
-            <Pressable
-              accessibilityRole="button"
-              style={secondaryButtonStyle}
-            >
+            <Pressable style={secondaryButtonStyle}>
               <Text style={[styles.buttonLabel, styles.secondaryButtonLabel]}>Mina bokningar</Text>
             </Pressable>
           </Link>
