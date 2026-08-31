@@ -9,6 +9,11 @@ const timeFormatter = new Intl.DateTimeFormat('sv-SE', {
   minute: '2-digit',
 });
 
+const longDateFormatter = new Intl.DateTimeFormat('sv-SE', {
+  day: 'numeric',
+  month: 'long',
+});
+
 export function addDays(date: Date, numberOfDays: number) {
   const nextDate = new Date(date);
   nextDate.setDate(nextDate.getDate() + numberOfDays);
@@ -32,6 +37,10 @@ export function startOfDay(date: Date) {
 
 export function formatShortDate(date: Date) {
   return shortDateFormatter.format(date).replace('.', '');
+}
+
+export function formatLongDate(date: Date) {
+  return longDateFormatter.format(date);
 }
 
 export function formatTimeRange(startsAt: string, endsAt: string) {

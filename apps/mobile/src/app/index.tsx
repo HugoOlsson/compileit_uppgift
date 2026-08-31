@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   intro: {
     alignSelf: 'center',
-    marginTop: spacing.xl,
+    marginTop: spacing.xxl,
     maxWidth: 300,
     width: '100%',
   },
@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
     color: palette.ink,
     fontFamily: fontFamily.regular,
     fontSize: 40,
-    letterSpacing: -1.5,
-    lineHeight: 47,
+    letterSpacing: -2,
+    lineHeight: 40,
   },
   titleEmphasis: {
     fontFamily: fontFamily.bold,
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   description: {
     color: palette.muted,
     fontFamily: fontFamily.regular,
-    fontSize: 17,
+    fontSize: 15,
     letterSpacing: -0.4,
     lineHeight: 20,
     marginTop: spacing.md,

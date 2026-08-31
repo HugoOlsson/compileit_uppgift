@@ -34,6 +34,28 @@ export default function BookingScreen() {
     }
   }
 
+  function continueBooking() {
+    if (!selectedSlot) {
+      return;
+    }
+
+    const room = availability.rooms.find((room) => room.id === selectedSlot.roomId);
+
+    if (!room) {
+      return;
+    }
+
+    router.push({
+      pathname: '/confirm-booking',
+      params: {
+        endsAt: selectedSlot.endsAt,
+        roomId: room.id,
+        roomName: room.name,
+        startsAt: selectedSlot.startsAt,
+      },
+    });
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.page}>
@@ -68,6 +90,7 @@ export default function BookingScreen() {
         <Pressable
           accessibilityState={{ disabled: !selectedSlot }}
           disabled={!selectedSlot}
+          onPress={continueBooking}
           style={[styles.nextButton, !selectedSlot && styles.disabledNextButton]}
         >
           <Text style={[styles.nextButtonLabel, !selectedSlot && styles.disabledNextButtonLabel]}>

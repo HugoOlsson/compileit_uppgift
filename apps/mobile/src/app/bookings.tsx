@@ -6,13 +6,6 @@ import { fontFamily, palette, spacing } from '@/theme/tokens';
 export default function BookingsScreen() {
   return (
     <>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTitleStyle: styles.headerTitle,
-          title: 'Mina bokningar',
-        }}
-      />
       <View style={styles.container}>
         <Text style={styles.text}>Visa sparade bokningar här.</Text>
       </View>
