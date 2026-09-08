@@ -4,17 +4,27 @@ React Native client for the Compileit meeting-room booking case. The app uses Ex
 
 ## Get started
 
-1. Install dependencies:
+1. Copy `.env.example` to `.env` and replace `YOUR_COMPUTER_IP` with the local IP address of the computer running the API.
+
+2. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Start Expo:
+3. Install the native development build the first time:
+
+   ```bash
+   npx expo run:ios --device
+   ```
+
+4. Start Expo for subsequent development:
 
    ```bash
    npm start
    ```
+
+Make sure the backend in `../api` is running before opening the booking calendar.
 
 From the Expo terminal, open the app in:
 

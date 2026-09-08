@@ -1,13 +1,9 @@
+import PagerView, {
+  type PagerViewOnPageSelectedEvent,
+  type PagerViewRef,
+} from '@expo/ui/community/pager-view';
 import { useRef, useState } from 'react';
-import {
-  FlatList,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import TimeSlotCard from '@/components/booking/time-slot-card';
 import { fontFamily, palette, radius } from '@/theme/tokens';
@@ -21,7 +17,8 @@ interface BookingCalendarProps {
   selectedRoomIds: string[];
   selectedSlotId: string | null;
   onSelectSlot: (slotId: string) => void;
-  onWindowChange: () => void;
+  onWindowChange: (windowIndex: number) => void;
+  onReady: () => void;
 }
 
 export default function BookingCalendar({
@@ -32,103 +29,83 @@ export default function BookingCalendar({
   selectedSlotId,
   onSelectSlot,
   onWindowChange,
+  onReady,
 }: BookingCalendarProps) {
-  const listRef = useRef<FlatList<Date[]>>(null);
-  const [pageWidth, setPageWidth] = useState(0);
+  const pagerRef = useRef<PagerViewRef>(null);
   const [windowIndex, setWindowIndex] = useState(0);
-
   const activeDates = dateWindows[windowIndex];
   const dateRangeLabel = activeDates
     ? `${formatShortDate(activeDates[0])} - ${formatShortDate(activeDates.at(-1)!)}`
     : '';
 
-  function setActiveWindow(nextIndex: number) {
-    if (nextIndex === windowIndex) {
-      return;
-    }
-
+  function changeWindow(event: PagerViewOnPageSelectedEvent) {
+    const nextIndex = event.nativeEvent.position;
     setWindowIndex(nextIndex);
-    onWindowChange();
+    onWindowChange(nextIndex);
   }
 
   function moveToWindow(nextIndex: number) {
-    if (nextIndex < 0 || nextIndex >= dateWindows.length) {
-      return;
+    if (nextIndex >= 0 && nextIndex < dateWindows.length) {
+      pagerRef.current?.setPage(nextIndex);
     }
-
-    setActiveWindow(nextIndex);
-    listRef.current?.scrollToIndex({ animated: true, index: nextIndex });
-  }
-
-  function handleScrollEnd(event: NativeSyntheticEvent<NativeScrollEvent>) {
-    const width = event.nativeEvent.layoutMeasurement.width;
-    const nextIndex = Math.round(event.nativeEvent.contentOffset.x / width);
-    setActiveWindow(nextIndex);
   }
 
   return (
     <View style={styles.calendar}>
-      <View onLayout={(event) => setPageWidth(event.nativeEvent.layout.width)} style={styles.pager}>
-        {pageWidth > 0 && (
-          <FlatList
-            data={dateWindows}
-            decelerationRate="fast"
-            disableIntervalMomentum
-            extraData={`${selectedRoomIds.join(',')}:${selectedSlotId ?? ''}`}
-            getItemLayout={(_, index) => ({
-              index,
-              length: pageWidth,
-              offset: pageWidth * index,
+      <PagerView
+        initialPage={0}
+        offscreenPageLimit={3}
+        onLayout={onReady}
+        onPageSelected={changeWindow}
+        ref={pagerRef}
+        style={styles.pager}
+      >
+        {dateWindows.map((dates) => (
+          <ScrollView
+            contentContainerStyle={styles.schedule}
+            directionalLockEnabled
+            key={getDateKey(dates[0])}
+            showsVerticalScrollIndicator={false}
+            style={styles.scheduleScroll}
+          >
+            {dates.map((date, dayIndex) => {
+              const dateKey = getDateKey(date);
+              const slotsForDate = slots.filter(
+                (slot) =>
+                  selectedRoomIds.includes(slot.roomId) &&
+                  getDateKey(new Date(slot.startsAt)) === dateKey,
+              );
+
+              return (
+                <View
+                  key={dateKey}
+                  style={[styles.dayColumn, dayIndex > 0 && styles.dayColumnBorder]}
+                >
+                  <View style={styles.dayHeader}>
+                    <Text style={styles.dayTitle}>{formatShortDate(date)}</Text>
+                  </View>
+
+                  <View style={styles.slots}>
+                    {slotsForDate.map((slot) => {
+                      const room = rooms.find((room) => room.id === slot.roomId);
+
+                      return room ? (
+                        <TimeSlotCard
+                          key={slot.id}
+                          onSelect={onSelectSlot}
+                          room={room}
+                          selected={slot.id === selectedSlotId}
+                          slot={slot}
+                        />
+                      ) : null;
+                    })}
+                  </View>
+                </View>
+              );
             })}
-            horizontal
-            keyExtractor={(dates) => getDateKey(dates[0])}
-            onMomentumScrollEnd={handleScrollEnd}
-            pagingEnabled
-            ref={listRef}
-            renderItem={({ item: dates }) => (
-              <View style={[styles.schedule, { width: pageWidth }]}>
-                {dates.map((date, dayIndex) => {
-                  const dateKey = getDateKey(date);
-                  const slotsForDate = slots.filter(
-                    (slot) =>
-                      selectedRoomIds.includes(slot.roomId) &&
-                      getDateKey(new Date(slot.startsAt)) === dateKey,
-                  );
-
-                  return (
-                    <View
-                      key={dateKey}
-                      style={[styles.dayColumn, dayIndex > 0 && styles.dayColumnBorder]}
-                    >
-                      <View style={styles.dayHeader}>
-                        <Text style={styles.dayTitle}>{formatShortDate(date)}</Text>
-                      </View>
-
-                      <View style={styles.slots}>
-                        {slotsForDate.map((slot) => {
-                          const room = rooms.find((room) => room.id === slot.roomId);
-
-                          return room ? (
-                            <TimeSlotCard
-                              key={slot.id}
-                              onSelect={onSelectSlot}
-                              room={room}
-                              selected={slot.id === selectedSlotId}
-                              slot={slot}
-                            />
-                          ) : null;
-                        })}
-                      </View>
-                    </View>
-                  );
-                })}
-              </View>
-            )}
-            showsHorizontalScrollIndicator={false}
-            style={styles.list}
-          />
-        )}
-      </View>
+          </ScrollView>
+        ))}
+      </PagerView>
 
       <View style={styles.calendarNavigation}>
         <Pressable
@@ -214,16 +191,15 @@ const styles = StyleSheet.create({
   disabledArrow: {
     opacity: 0.35,
   },
-  list: {
-    flex: 1,
-  },
   pager: {
     flex: 1,
-    overflow: 'hidden',
   },
   schedule: {
-    flex: 1,
     flexDirection: 'row',
+    flexGrow: 1,
+  },
+  scheduleScroll: {
+    flex: 1,
   },
   slots: {
     paddingTop: 7,

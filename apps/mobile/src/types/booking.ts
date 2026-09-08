@@ -1,5 +1,3 @@
-export type IsoDateTime = string;
-
 export interface Room {
   id: string;
   name: string;
@@ -9,34 +7,33 @@ export interface Room {
 export interface AvailabilitySlot {
   id: string;
   roomId: string;
-  startsAt: IsoDateTime;
-  endsAt: IsoDateTime;
+  startsAt: string;
+  endsAt: string;
 }
 
-export interface AvailabilityQuery {
-  startsAt: IsoDateTime;
-  endsAt: IsoDateTime;
-  roomIds?: string[];
+export interface BookingsQuery {
+  startsAt: string;
+  endsAt: string;
 }
 
-export interface AvailabilityResponse {
+export interface CalendarData {
   rooms: Room[];
-  slots: AvailabilitySlot[];
+  bookings: Booking[];
+  dateWindows: Date[][];
 }
 
 export interface Booking {
   id: string;
   roomId: string;
-  startsAt: IsoDateTime;
-  endsAt: IsoDateTime;
+  startsAt: string;
+  endsAt: string;
   bookerName: string;
-  createdAt: IsoDateTime;
 }
 
 export interface CreateBookingRequest {
   roomId: string;
-  startsAt: IsoDateTime;
-  endsAt: IsoDateTime;
+  startsAt: string;
+  endsAt: string;
   bookerName: string;
 }
 
@@ -47,5 +44,10 @@ export interface CreateBookingResponse {
 
 export interface CancelBookingRequest {
   bookingId: string;
+  cancellationToken: string;
+}
+
+export interface SavedBooking extends Booking {
+  roomName: string;
   cancellationToken: string;
 }

@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BookingConfirmationModal from '@/components/booking/booking-confirmation-modal';
 import { createBooking } from '@/services/booking-service';
+import { saveBooking } from '@/services/booking-storage';
 import { fontFamily, palette, radius } from '@/theme/tokens';
 import type { CreateBookingResponse } from '@/types/booking';
 
@@ -43,11 +44,12 @@ export default function ConfirmBookingScreen() {
     try {
       const result = await createBooking({
         bookerName: name.trim(),
-        endsAt,
         roomId,
         startsAt,
+        endsAt,
       });
 
+      await saveBooking(result, roomName);
       setConfirmation(result);
     } catch {
       Alert.alert('Bokningen misslyckades', 'Försök igen om en liten stund.');
