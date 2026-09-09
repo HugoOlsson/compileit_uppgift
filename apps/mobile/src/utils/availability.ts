@@ -2,6 +2,7 @@ import type { AvailabilitySlot, Booking, Room } from '@/types/booking';
 
 export function createAvailableSlots(dates: Date[], rooms: Room[], bookings: Booking[]) {
   const slots: AvailabilitySlot[] = [];
+  const now = Date.now();
 
   for (const date of dates) {
     for (let hour = 8; hour < 17; hour += 1) {
@@ -14,6 +15,10 @@ export function createAvailableSlots(dates: Date[], rooms: Room[], bookings: Boo
         );
         const endsAt = new Date(startsAt);
         endsAt.setHours(hour + 1);
+
+        if (startsAt.getTime() < now) {
+          continue;
+        }
 
         const isBooked = bookings.some(
           (booking) =>

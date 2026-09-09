@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+
+import RoomsIllustration from '../../assets/illustrations/rooms.svg';
 
 const ROOMS = [
   { height: 63.4262, width: 62.5806, x: 65.2719, y: 86.414 },
@@ -66,6 +67,7 @@ export default function AnimatedRoomsIllustration() {
 
   return (
     <View style={styles.container}>
+      <RoomsIllustration height={216} style={styles.frame} width={215} />
       {ROOMS.map((room, index) => (
         <AnimatedRoom
           {...room}
@@ -73,16 +75,6 @@ export default function AnimatedRoomsIllustration() {
           key={`${room.x}-${room.y}`}
         />
       ))}
-
-      <Svg height={216} style={styles.frame} viewBox="0 0 215 216" width={215}>
-        <Path
-          d="M42.9355 107.556H1V64.6621M213.633 127.286V64.1429M1 64.6621V1H42.9355M1 64.6621H21.2089M42.9355 1V64.6621M42.9355 1H150.37M106.677 214.112H64.5822V150.091M128.883 127.206V86.0692H64.5822V150.091M64.5822 150.091H128.883M128.883 214.112H149.891M172.097 150.091H213.633V214.112H149.891M149.891 214.112V150.091M213.633 64.1429V1H150.37M213.633 64.1429H150.37M150.37 1V42.4562"
-          fill="none"
-          stroke="black"
-          strokeOpacity={0.47}
-          strokeWidth={2}
-        />
-      </Svg>
     </View>
   );
 }

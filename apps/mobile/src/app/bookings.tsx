@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -13,11 +13,20 @@ export default function BookingsScreen() {
   const [bookings, setBookings] = useState<SavedBooking[]>([]);
   const [cancellingId, setCancellingId] = useState<string | null>(null);
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
+    let active = true;
     getSavedBookings()
-      .then(setBookings)
-      .catch(() => Alert.alert('Kunde inte läsa dina bokningar.'));
-  }, []);
+      .then((savedBookings) => {
+        if (active) {
+          const now = Date.now();
+          setBookings(savedBookings.filter((booking) => new Date(booking.endsAt).getTime() > now));
+        }
+      })
+      .catch(() => {
+        if (active) Alert.alert('Kunde inte läsa dina bokningar.');
+      });
+    return () => { active = false; };
+  }, []));
 
   function confirmCancellation(booking: SavedBooking) {
     Alert.alert(
@@ -66,7 +75,7 @@ export default function BookingsScreen() {
 
         <ScrollView contentContainerStyle={styles.list}>
           {bookings.length === 0 ? (
-            <Text style={styles.emptyText}>Du har inga bokningar ännu.</Text>
+            <Text style={styles.emptyText}>Du har inga pågående eller kommande bokningar.</Text>
           ) : (
             bookings.map((booking) => (
               <View key={booking.id} style={styles.card}>

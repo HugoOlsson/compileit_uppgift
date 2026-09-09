@@ -16,6 +16,7 @@ import { createBooking } from '@/services/booking-service';
 import { saveBooking } from '@/services/booking-storage';
 import { fontFamily, palette, radius } from '@/theme/tokens';
 import type { CreateBookingResponse } from '@/types/booking';
+import { formatLongDate, formatTimeRange } from '@/utils/date';
 
 type ConfirmBookingParams = {
   roomId: string;
@@ -35,6 +36,11 @@ export default function ConfirmBookingScreen() {
 
   async function submitBooking() {
     if (!hasFullName || submitting) {
+      return;
+    }
+
+    if (new Date(startsAt).getTime() < Date.now()) {
+      Alert.alert('Tiden har passerat', 'Gå tillbaka och välj en ny tid.');
       return;
     }
 
@@ -82,6 +88,14 @@ export default function ConfirmBookingScreen() {
             style={styles.input}
             value={name}
           />
+        </View>
+
+        <View style={styles.bookingSummary}>
+          <Text style={styles.summaryLabel}>Din valda tid</Text>
+          <Text style={styles.summaryRoom}>{roomName}</Text>
+          <Text style={styles.summaryTime}>
+            {formatLongDate(new Date(startsAt))} · {formatTimeRange(startsAt, endsAt)}
+          </Text>
         </View>
 
         <View style={styles.bottomContent}>
@@ -177,7 +191,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   form: {
-    marginTop: 52,
+    marginTop: 28,
+  },
+  bookingSummary: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: radius.md,
+    marginTop: 28,
+    padding: 16,
+  },
+  summaryLabel: {
+    color: palette.muted,
+    fontFamily: fontFamily.medium,
+    fontSize: 11,
+    marginBottom: 6,
+  },
+  summaryRoom: {
+    color: palette.ink,
+    fontFamily: fontFamily.semibold,
+    fontSize: 16,
+  },
+  summaryTime: {
+    color: palette.ink,
+    fontFamily: fontFamily.regular,
+    fontSize: 13,
+    lineHeight: 20,
+    marginTop: 4,
   },
   input: {
     borderColor: palette.border,

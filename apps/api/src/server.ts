@@ -51,6 +51,11 @@ app.post('/bookings', (request, response) => {
     return;
   }
 
+  if (startDate.getTime() < Date.now()) {
+    response.status(400).json({ message: 'The start time has already passed.' });
+    return;
+  }
+
   const result = createBooking({
     roomId,
     startsAt: startDate.toISOString(),
