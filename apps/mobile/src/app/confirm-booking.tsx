@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import {
   Alert,
@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import BookingConfirmationModal from '@/components/booking/booking-confirmation-modal';
-import { createBooking } from '@/services/booking-service';
+import { ApiError, createBooking } from '@/services/booking-service';
 import { saveBooking } from '@/services/booking-storage';
 import { fontFamily, palette, radius } from '@/theme/tokens';
 import type { CreateBookingResponse } from '@/types/booking';
@@ -32,6 +32,16 @@ export default function ConfirmBookingScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [confirmation, setConfirmation] = useState<CreateBookingResponse | null>(null);
 
+  const startTime = typeof startsAt === 'string' ? Date.parse(startsAt) : NaN;
+  const endTime = typeof endsAt === 'string' ? Date.parse(endsAt) : NaN;
+
+  if (
+    ![roomId, roomName].every((value) => typeof value === 'string' && value.trim()) ||
+    !Number.isFinite(startTime) || !Number.isFinite(endTime) || startTime >= endTime
+  ) {
+    return <Redirect href="/booking" />;
+  }
+
   const hasFullName = name.trim().split(/\s+/).length >= 2;
 
   async function submitBooking() {
@@ -39,7 +49,7 @@ export default function ConfirmBookingScreen() {
       return;
     }
 
-    if (new Date(startsAt).getTime() < Date.now()) {
+    if (startTime < Date.now()) {
       Alert.alert('Tiden har passerat', 'Gå tillbaka och välj en ny tid.');
       return;
     }
@@ -57,8 +67,14 @@ export default function ConfirmBookingScreen() {
 
       await saveBooking(result, roomName);
       setConfirmation(result);
-    } catch {
-      Alert.alert('Bokningen misslyckades', 'Försök igen om en liten stund.');
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 409) {
+        Alert.alert('Tiden är redan bokad', 'Välj en annan tid i kalendern.', [
+          { text: 'Välj en ny tid', onPress: () => router.dismissTo('/booking') },
+        ]);
+      } else {
+        Alert.alert('Bokningen misslyckades', 'Försök igen om en liten stund.');
+      }
     } finally {
       setSubmitting(false);
     }

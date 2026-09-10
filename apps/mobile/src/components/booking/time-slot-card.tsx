@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   startTime: {
     color: palette.ink,
     fontFamily: fontFamily.semibold,
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 18,
     fontVariant: ['tabular-nums'],
   },

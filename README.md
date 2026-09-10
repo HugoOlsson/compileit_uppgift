@@ -2,6 +2,12 @@
 
 A meeting-room booking app built for the Compileit coding case.
 
+## Demo
+
+[![Compileit Rooms booking demo at 2× speed](docs/demo.gif)](docs/demo.mp4)
+
+[Full-resolution video (MP4, 2× speed)](docs/demo.mp4)
+
 ## Structure
 
 ```text

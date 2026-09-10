@@ -2,6 +2,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -29,7 +30,7 @@ function createDateWindows(firstDate: Date) {
 
 export default function BookingScreen() {
   const [calendarData, setCalendarData] = useState<CalendarData | null>(null);
-  const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>([]);
+  const [selectedRoomIds, setSelectedRoomIds] = useState<string[]>(['margret']);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -49,7 +50,6 @@ export default function BookingScreen() {
       const firstDate = startOfDay(new Date());
       const dateWindows = createDateWindows(firstDate);
 
-      setCalendarData(null);
       setLoadError(false);
       setSelectedSlotId(null);
 
@@ -63,7 +63,6 @@ export default function BookingScreen() {
         .then(([rooms, bookings]) => {
           if (active) {
             setCalendarData({ bookings, dateWindows, rooms });
-            setSelectedRoomIds(['margret']);
           }
         })
         .catch(() => {
@@ -90,6 +89,13 @@ export default function BookingScreen() {
 
   function continueBooking() {
     if (!calendarData || !selectedSlot) {
+      return;
+    }
+
+    if (new Date(selectedSlot.startsAt).getTime() < Date.now()) {
+      setSelectedSlotId(null);
+      setCalendarData({ ...calendarData });
+      Alert.alert('Tiden har passerat', 'Välj en ny tid i kalendern.');
       return;
     }
 
@@ -127,6 +133,17 @@ export default function BookingScreen() {
 
         {calendarData ? (
           <>
+            {loadError && (
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setRetryCount((count) => count + 1)}
+              >
+                <Text style={styles.errorText}>
+                  Kunde inte uppdatera tider. Tryck för att försöka igen.
+                </Text>
+              </Pressable>
+            )}
+
             <RoomFilter
               onChange={changeRoomFilter}
               rooms={calendarData.rooms}

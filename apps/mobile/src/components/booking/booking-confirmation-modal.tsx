@@ -48,7 +48,7 @@ export default function BookingConfirmationModal({
             <SymbolView
               name={{ android: 'check', ios: 'checkmark', web: 'check' }}
               size={32}
-              tintColor="#00639A"
+              tintColor={palette.muted}
             />
           </View>
 
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   },
   checkCircle: {
     alignItems: 'center',
-    backgroundColor: '#CDEEFF',
+    backgroundColor: '#F4F4F4',
     borderRadius: radius.pill,
     height: 70,
     justifyContent: 'center',

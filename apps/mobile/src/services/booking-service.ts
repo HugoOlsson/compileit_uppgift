@@ -9,13 +9,19 @@ import type {
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 
+export class ApiError extends Error {
+  constructor(public readonly status: number, message: string) {
+    super(message);
+  }
+}
+
 async function getResponse<T>(response: Response): Promise<T> {
   if (response.ok) {
     return response.json() as Promise<T>;
   }
 
   const error = (await response.json()) as { message?: string };
-  throw new Error(error.message ?? 'API request failed.');
+  throw new ApiError(response.status, error.message ?? 'API request failed.');
 }
 
 export async function getRooms() {
