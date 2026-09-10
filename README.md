@@ -2,6 +2,12 @@
 
 A meeting-room booking app built for the Compileit coding case.
 
+## Design
+
+View the app's UI design in [Figma — CompileIt Case](https://www.figma.com/design/YUAa816ECherphR8dzs7u1/CompileIt-Case?node-id=0-1&t=icNWV2huD9qoHfwz-1).
+
+The Figma design is the foundation for the app's look and feel. To give the app a more native feel and refine the design, native modals replace the popups shown in the Figma sketch.
+
 ## Demo
 
 [![Compileit Rooms booking demo at 2× speed](docs/demo.gif)](docs/demo.mp4)
@@ -65,3 +71,21 @@ DELETE /bookings/:id
 ```
 
 SQLite contains only a `bookings` table. The backend checks overlapping time intervals in a transaction before inserting a booking.
+
+## Inspect the database
+
+With `sqlite3` installed, run these commands from the server root (`apps/api`) in a separate terminal. Start the API at least once so the database exists.
+
+```bash
+# List tables
+sqlite3 -readonly data/rooms.db ".tables"
+
+# Show the bookings table structure
+sqlite3 -readonly data/rooms.db ".schema bookings"
+
+# List all bookings, ordered by start time
+sqlite3 -readonly -header -column data/rooms.db \
+  "SELECT id, room_id, starts_at, ends_at, booker_name FROM bookings ORDER BY starts_at;"
+```
+
+Each command opens the database in read-only mode and exits automatically.
